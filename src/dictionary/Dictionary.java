@@ -1,20 +1,93 @@
 package dictionary;
 
+import exceptions.ChildlessNodeException;
+import exceptions.InvalidRootException;
+import exceptions.WordNotFoundException;
+import node.Node;
+
 public class Dictionary implements IDictionary {
+	private static Dictionary _instance;
+	private Node _root;
+	
+	private Dictionary() {
+		_root = new Node();
+		_root._parent = _root;
+	}
+	
+	public static Dictionary getInstance() {
+		if (_instance == null) {
+			_instance = new Dictionary();
+		}
+		
+		return _instance;
+	}
 
 	public void addWord(String word) {
-		// TODO Auto-generated method stub
+		Node currentNode = _root;
+		String subWord = word;
+		while (!subWord.isEmpty()) {
+			char currentLink = subWord.charAt(0);
+			if (!currentNode.hasChild(currentLink)) {
+				currentNode.addChild(currentLink);				
+			}
+			currentNode = currentNode.getChild(currentLink);
+			subWord = subWord.substring(1);
+		}
 		
+		currentNode._data = word;
 	}
 
 	public void removeWord(String word) {
-		// TODO Auto-generated method stub
+		Node wordContainerNode = null;
+		try {
+			wordContainerNode = Node.getByWord(word, _root);
+		} catch (InvalidRootException e) {
+			System.err.println("Malformed Tree!");
+			e.printStackTrace();
+		} catch (WordNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
 		
+		wordContainerNode._data = null;
+		if (!wordContainerNode.hasChildren()) {
+			Node parent = wordContainerNode._parent;
+			char link = 0;
+			try {
+				link = Node.findLink(parent, wordContainerNode);
+			} catch (ChildlessNodeException e) {
+				// Pass...
+			}
+			parent.removeChild(link);
+		}
 	}
 
 	public void printAllWords(String word) {
-		// TODO Auto-generated method stub
+		try {
+			Node wordContainerNode = Node.getByWord(word, _root);
+			printAllWords(wordContainerNode);
+		} catch (InvalidRootException e) {
+			e.printStackTrace();
+		} catch (WordNotFoundException e) {
+			System.out.println("\"" + word + "\" is not present in this dictionary!");
+		}
+	}
+
+	private void printAllWords(Node node) {
+		if (node._data != null) {
+			System.out.println(node._data);
+		}
+
+		if (!node.hasChildren()) {			
+			return;
+		}
+				
+		for (Node child : node.getChildren()) {
+			if (child != null) {
+				printAllWords(child);
+			}
+		}
 		
+		return;
 	}
 
 }
