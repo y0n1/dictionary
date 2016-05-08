@@ -45,7 +45,8 @@ public class Dictionary implements IDictionary {
 			System.err.println("Malformed Tree!");
 			e.printStackTrace();
 		} catch (WordNotFoundException e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
+			return;
 		}
 		
 		wordContainerNode._data = null;
@@ -68,7 +69,7 @@ public class Dictionary implements IDictionary {
 		} catch (InvalidRootException e) {
 			e.printStackTrace();
 		} catch (WordNotFoundException e) {
-			System.out.println("\"" + word + "\" is not present in this dictionary!");
+			System.err.println("\"" + word + "\" is not present in the dictionary!");
 		}
 	}
 
